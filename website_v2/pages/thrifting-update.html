@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Vogue Thrift Store - Buy and sell pre-loved fashion items with our AI-powered thrifting platform.">
+    <meta name="keywords" content="thrift store, second-hand fashion, sustainable fashion, pre-loved clothing, sell clothes online">
+    <meta name="author" content="AI Vogue">
+    <meta property="og:title" content="AI Vogue - Thrift Store">
+    <meta property="og:description" content="Buy and sell pre-loved fashion items with our AI-powered thrifting platform.">
+    <meta property="og:type" content="website">
+    <title>AI Vogue - Thrift Store</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/thrifting.css">
+    <link rel="stylesheet" href="../css/pages/home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/core/theme-toggle.js" defer></script>
+    <script src="../js/pages/thrifting.js" defer></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        /* Cart Panel Styles */
+        .cart-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-index-modal);
+            transition: right var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-panel.active {
+            right: 0;
+        }
+        
+        .cart-header {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+        }
+        
+        .cart-item {
+            display: flex;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-light-gray);
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            margin-right: var(--spacing-md);
+        }
+        
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-details h4 {
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--color-gray);
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 var(--spacing-xs);
+        }
+        
+        .item-quantity {
+            margin: 0 var(--spacing-xs);
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-secondary);
+            margin-left: var(--spacing-sm);
+        }
+        
+        .cart-footer {
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--color-light-gray);
+        }
+        
+        .cart-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            font-weight: 600;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            color: var(--color-gray);
+        }
+        
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: calc(var(--z-index-modal) - 1);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+        
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Checkout Form Styles */
+        .checkout-container {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-index-modal);
+            transition: right var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .checkout-container.active {
+            right: 0;
+        }
+        
+        .checkout-form {
+            padding: var(--spacing-md);
+            overflow-y: auto;
+        }
+        
+        /* User Dashboard Styles */
+        .user-dashboard {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-index-modal);
+            transition: right var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-dashboard.active {
+            right: 0;
+        }
+        
+        .dashboard-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-light-gray);
+        }
+        
+        .dashboard-tab {
+            flex: 1;
+            padding: var(--spacing-md);
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+        
+        .dashboard-tab.active {
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .dashboard-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .dashboard-section {
+            display: none;
+            padding: var(--spacing-md);
+        }
+        
+        .dashboard-section.active {
+            display: block;
+        }
+        
+        .order-card, .wishlist-item, .listing-item {
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-light);
+        }
+        
+        .order-header, .order-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .order-items {
+            margin: var(--spacing-sm) 0;
+        }
+        
+        .order-status {
+            padding: 2px 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+        }
+        
+        .order-status.processing {
+            background-color: var(--color-accent);
+        }
+        
+        .order-status.shipped {
+            background-color: var(--color-primary-light);
+            color: var(--color-white);
+        }
+        
+        .order-status.delivered {
+            background-color: #4CAF50;
+            color: var(--color-white);
+        }
+        
+        .wishlist-item, .listing-item {
+            display: flex;
+        }
+        
+        .wishlist-image, .listing-image {
+            width: 80px;
+            height: 80px;
+            margin-right: var(--spacing-md);
+            position: relative;
+        }
+        
+        .wishlist-image img, .listing-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .wishlist-details, .listing-details {
+            flex: 1;
+        }
+        
+        .wishlist-actions, .listing-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .listing-status {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 2px 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+        }
+        
+        .listing-status.active {
+            background-color: #4CAF50;
+            color: var(--color-white);
+        }
+        
+        .listing-status.sold {
+            background-color: var(--color-secondary);
+            color: var(--color-white);
+        }
+        
+        /* Order Tracking Styles */
+        .tracking-modal .modal-content {
+            max-width: 600px;
+        }
+        
+        .tracking-steps {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .tracking-step {
+            display: flex;
+            margin-bottom: var(--spacing-lg);
+            position: relative;
+        }
+        
+        .step-indicator {
+            position: relative;
+            margin-right: var(--spacing-md);
+        }
+        
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--color-gray);
+            background-color: var(--color-white);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 24px;
+            left: 11px;
+            width: 2px;
+            height: calc(100% - 24px);
+            background-color: var(--color-gray);
+        }
+        
+        .tracking-step.completed .step-icon {
+            border-color: var(--color-primary);
+            background-color: var(--color-primary);
+        }
+        
+        .tracking-step.completed .step-line {
+            background-color: var(--color-primary);
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-name {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .tracking-step.completed .step-name {
+            color: var(--color-primary);
+        }
+        
+        .tracking-step .step-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-white);
+            opacity: 0;
+        }
+        
+        .tracking-step.completed .step-icon::after {
+            opacity: 1;
+        }
+        
+        /* Animations */
+        .tracking-step {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .tracking-step.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .step-line {
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.6s ease;
+        }
+        
+        .step-line.animate {
+            transform: scaleY(1);
+        }
+        
+        /* Cart Badge */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--color-secondary);
+            color: var(--color-white);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .cart-badge.pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .cart-panel, .checkout-container, .user-dashboard {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .header-actions {
+                position: static;
+                margin-top: var(--spacing-md);
+                justify-content: center;
+            }
+            
+            .quick-view-layout {
+                flex-direction: column;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        
+        /* Enhanced Button Styles */
+        .nav-actions button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: all var(--transition-normal);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Enhanced Product Card Styles */
+        .product-card {
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            box-shadow: 0 0 0 2px var(--color-black);
+        }
+        
+        .dark-mode .product-card {
+            box-shadow: 0 0 0 2px var(--color-white);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 0 3px var(--color-primary);
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: var(--z-index-toast);
+        }
+
+        .toast {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+            max-width: 300px;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--color-secondary);
+        }
+
+        .toast-icon {
+            margin-right: 10px;
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: var(--z-index-modal);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.modal-active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            margin: auto;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: var(--spacing-md);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-gray);
+            transition: color var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            color: var(--color-secondary);
+        }
+
+        /* Image Preview */
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed var(--color-gray);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-sm);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-preview.has-image {
+            border: none;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-placeholder {
+            color: var(--color-gray);
+            text-align: center;
+        }
+
+        /* Quick View Styles */
+        .quick-view-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .quick-view-image {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .quick-view-image img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius-md);
+            object-fit: cover;
+        }
+
+        .quick-view-details {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .quick-view-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .quick-view-price {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin: var(--spacing-md) 0;
+        }
+
+        .quick-view-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        /* Add to Cart Button Animation */
+        .btn-add-to-cart {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-add-to-cart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        .btn-add-to-cart:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .header-action-btn {
+            position: relative;
+            background: var(--color-white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+        }
+
+        .header-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .dark-mode .header-action-btn {
+            background: var(--color-dark);
+            color: var(--color-white);
+        }
+
+        /* Seller Dashboard Styles */
+        .seller-dashboard-container {
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .seller-dashboard-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-light-gray);
+        }
+        
+        .seller-dashboard-tab {
+            flex: 1;
+            padding: var(--spacing-md);
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+        
+        .seller-dashboard-tab.active {
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .listings-container {
+            padding: var(--spacing-md);
+        }
+        
+        .empty-listings {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            color: var(--color-gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .listing-item {
+            display: flex;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-light);
+            position: relative;
+        }
+        
+        .listing-image {
+            width: 80px;
+            height: 80px;
+            margin-right: var(--spacing-md);
+            position: relative;
+        }
+        
+        .listing-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .listing-details {
+            flex: 1;
+        }
+        
+        .listing-details h4 {
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+        
+        .listing-price {
+            color: var(--color-primary);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .listing-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray);
+        }
+        
+        .listing-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .listing-status {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 2px 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            background-color: #4CAF50;
+            color: var(--color-white);
+        }
+        
+        .btn-danger {
+            background-color: var(--color-secondary);
+            color: var(--color-white);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--color-secondary-dark);
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: var(--font-size-sm);
+        }
+        
+        .cancel-edit-btn {
+            margin-right: var(--spacing-sm);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-light-gray);
+            border-radius: var(--border-radius-sm);
+            background-color: var(--color-white);
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-control:focus {
+            border-color: var(--color-primary);
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* Product Grid Layout */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .product-card {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .product-image {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-normal);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .product-badge {
+            padding: 4px 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .badge-like-new {
+            background-color: #4CAF50;
+            color: var(--color-white);
+        }
+        
+        .badge-gently-used {
+            background-color: var(--color-primary-light);
+            color: var(--color-white);
+        }
+
+        .badge-vintage {
+            background-color: var(--color-accent);
+            color: var(--color-dark);
+        }
+
+        .badge-premium {
+            background-color: var(--color-secondary);
+            color: var(--color-white);
+        }
+
+        .badge-eco-friendly {
+            background-color: #8BC34A;
+            color: var(--color-dark);
+        }
+
+        .product-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all var(--transition-normal);
+        }
+
+        .product-card:hover .product-actions {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .product-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--color-white);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
+        }
+
+        .product-action-btn:hover {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .product-details {
+            padding: var(--spacing-md);
+        }
+
+        .product-brand {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .product-material {
+            color: var(--color-gray);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+        }
+
+        .product-size, .product-condition {
+            color: var(--color-gray);
+        }
+
+        .product-price {
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+            margin-top: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Product Card Button Styles */
+        .product-card-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .product-card-buttons .btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-card-buttons .btn i {
+            margin-right: 5px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background-color: var(--color-light);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--color-light-gray);
+            border-radius: var(--border-radius-sm);
+            background-color: var(--color-white);
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-sm);
+        }
+
+        /* Quick View Layout */
+        .quick-view-layout {
+            display: flex;
+            gap: var(--spacing-lg);
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="page-transition"></div>
+    
+    <header class="main-header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo">
+                    <a href="index.html" aria-label="AI Vogue Home">
+                        <span class="logo-text">AI Vogue</span>
+                    </a>
+                </div>
+                <div class="nav-links">
+                    <a href="avatar-creation.html" class="nav-link">3D Avatar</a>
+                    <a href="thrifting-update.html" class="nav-link active">Thrift Store</a>
+                    <a href="rental-hub.html" class="nav-link">Rent</a>
+                    <a href="chatbot.html" class="nav-link">AI Assistant</a>
+                    <a href="http://127.0.0.1:5501/ai-clothing-app/templates/index.html" class="nav-link">Style Guide</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </div>
+                <div class="nav-actions">
+                    <button class="theme-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" viewBox="0 0 24 24"><path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                    </button>
+                    <a href="login.html" class="btn btn-primary">Login</a>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+        
+        <div class="header-actions">
+            <button class="header-action-btn" id="cart-toggle" aria-label="Open cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-badge" id="cart-count">0</span>
+            </button>
+            <button class="header-action-btn" id="user-dashboard-toggle" aria-label="Open user dashboard">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero thrifting-hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Sustainable Fashion <br>For Everyone</h1>
+                    <p class="hero-subtitle">Buy and sell pre-loved fashion items with our AI-powered thrifting platform.</p>
+                    <div class="hero-cta">
+                        <button class="btn btn-primary btn-lg" id="sell-item-btn">Sell Your Items</button>
+                        <a href="#product-grid" class="btn btn-outline btn-lg">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-background">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <div class="container">
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label for="category-filter">Category</label>
+                        <select id="category-filter" class="filter-select">
+                            <option value="all">All Categories</option>
+                            <option value="tops">Tops</option>
+                            <option value="bottoms">Bottoms</option>
+                            <option value="dresses">Dresses</option>
+                            <option value="outerwear">Outerwear</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="size-filter">Size</label>
+                        <select id="size-filter" class="filter-select">
+                            <option value="all">All Sizes</option>
+                            <option value="xs">XS</option>
+                            <option value="s">S</option>
+                            <option value="m">M</option>
+                            <option value="l">L</option>
+                            <option value="xl">XL</option>
+                            <option value="xxl">XXL</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="price-filter">Price Range</label>
+                        <select id="price-filter" class="filter-select">
+                            <option value="all">All Prices</option>
+                            <option value="0-25">$0 - $25</option>
+                            <option value="25-50">$25 - $50</option>
+                            <option value="50-100">$50 - $100</option>
+                            <option value="100+">$100+</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="condition-filter">Condition</label>
+                        <select id="condition-filter" class="filter-select">
+                            <option value="all">All Conditions</option>
+                            <option value="new">New with tags</option>
+                            <option value="like-new">Like new</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary filter-btn">Apply Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="products-section" id="product-grid">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Items</h2>
+                    <p class="section-subtitle">Discover unique pre-loved fashion pieces</p>
+                </div>
+                <div class="product-grid">
+                    <!-- Product Card 1 -->
+                    <div class="product-card">
+                        <div class="product-badge sustainable">Sustainable</div>
+                        <div class="product-image">
+                            <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS-e6D9wBV5DTSC_L_IAQ2tevRPMaUpvvMMCXZBjBYfUShuWsGXulYROND0v4EhhR_eHa-mfALkct1NUJYfFTdeQXMJRLnM84lR24slDE7O">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="1">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="1">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="1">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Vintage Denim Jacket</h3>
+                            <div class="product-price">$45.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: M</span>
+                                <span class="product-condition">Condition: Good</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="1">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="1">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 2 -->
+                    <div class="product-card">
+                        <div class="product-badge new">Like New</div>
+                        <div class="product-image">
+                            <img src="../images/products/product-2.jpg" alt="Floral Summer Dress">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="2">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="2">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="2">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Floral Summer Dress</h3>
+                            <div class="product-price">$35.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: S</span>
+                                <span class="product-condition">Condition: Like New</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="2">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="2">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 3 -->
+                    <div class="product-card">
+                        <div class="product-badge sale">Sale</div>
+                        <div class="product-image">
+                            <img src="../images/products/product-3.jpg" alt="Leather Crossbody Bag">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="3">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="3">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="3">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Leather Crossbody Bag</h3>
+                            <div class="product-price"><span class="original-price">$60.00</span> $48.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: One Size</span>
+                                <span class="product-condition">Condition: Good</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="3">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="3">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 4 -->
+                    <div class="product-card">
+                        <div class="product-badge">New Arrival</div>
+                        <div class="product-image">
+                            <img src="../images/products/product-4.jpg" alt="Cashmere Sweater">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="4">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="4">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="4">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Cashmere Sweater</h3>
+                            <div class="product-price">$75.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: L</span>
+                                <span class="product-condition">Condition: New with tags</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="4">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="4">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 5 -->
+                    <div class="product-card">
+                        <div class="product-badge sustainable">Sustainable</div>
+                        <div class="product-image">
+                            <img src="../images/products/product-5.jpg" alt="Vintage High-Waisted Jeans">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="5">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="5">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="5">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Vintage High-Waisted Jeans</h3>
+                            <div class="product-price">$40.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: 28</span>
+                                <span class="product-condition">Condition: Good</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="5">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="5">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 6 -->
+                    <div class="product-card">
+                        <div class="product-badge new">Like New</div>
+                        <div class="product-image">
+                            <img src="../images/products/product-6.jpg" alt="Silk Blouse">
+                            <div class="product-actions">
+                                <button class="product-action-btn quick-view-btn" data-product-id="6">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="product-action-btn add-to-wishlist-btn" data-product-id="6">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <button class="product-action-btn add-to-cart-btn" data-product-id="6">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Silk Blouse</h3>
+                            <div class="product-price">$55.00</div>
+                            <div class="product-meta">
+                                <span class="product-size">Size: M</span>
+                                <span class="product-condition">Condition: Like New</span>
+                            </div>
+                            <div class="product-card-buttons">
+                                <button class="btn btn-primary add-to-cart-btn" data-product-id="6">
+                                    <i class="fas fa-shopping-bag"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline add-to-wishlist-btn" data-product-id="6">
+                                    <i class="far fa-heart"></i> Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="load-more-container">
+                    <button class="btn btn-outline load-more-btn">Load More</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart Panel -->
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-btn" id="close-cart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <div class="empty-cart" id="empty-cart">
+                <i class="fas fa-shopping-bag fa-3x"></i>
+                <p>Your cart is empty</p>
+                <button class="btn btn-primary">Start Shopping</button>
+            </div>
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button class="btn btn-primary btn-block" id="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div class="checkout-container" id="checkout-container">
+        <div class="cart-header">
+            <h3>Checkout</h3>
+            <button class="close-btn" id="close-checkout">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="checkout-form" id="checkout-form">
+            <div class="form-group">
+                <label for="checkout-name">Full Name</label>
+                <input type="text" id="checkout-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-email">Email Address</label>
+                <input type="email" id="checkout-email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-address">Shipping Address</label>
+                <textarea id="checkout-address" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="checkout-city">City</label>
+                <input type="text" id="checkout-city" class="form-control" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="checkout-state">State/Province</label>
+                    <input type="text" id="checkout-state" class="form-control" required>
+                </div>
+                <div class="form-group half">
+                    <label for="checkout-zip">Zip/Postal Code</label>
+                    <input type="text" id="checkout-zip" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="checkout-country">Country</label>
+                <select id="checkout-country" class="form-control" required>
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="checkout-payment">Payment Method</label>
+                <select id="checkout-payment" class="form-control" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="credit">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="apple">Apple Pay</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Complete Order</button>
+        </form>
+    </div>
+
+    <!-- User Dashboard -->
+    <div class="user-dashboard" id="user-dashboard">
+        <div class="cart-header">
+            <h3>My Account</h3>
+            <button class="close-btn" id="close-dashboard">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="dashboard-tabs">
+            <div class="dashboard-tab active" data-tab="orders">Orders</div>
+            <div class="dashboard-tab" data-tab="wishlist">Wishlist</div>
+            <div class="dashboard-tab" data-tab="listings">My Listings</div>
+        </div>
+        <div class="dashboard-content">
+            <div class="dashboard-section active" id="orders-section">
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">Order #12345</span>
+                        <span class="order-date">June 15, 2023</span>
+                    </div>
+                    <div class="order-items">
+                        <p>Vintage Denim Jacket, Floral Summer Dress</p>
+                    </div>
+                    <div class="order-footer">
+                        <span class="order-total">$80.00</span>
+                        <span class="order-status processing">Processing</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline track-order-btn" data-order-id="12345">Track Order</button>
+                </div>
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">Order #12344</span>
+                        <span class="order-date">May 28, 2023</span>
+                    </div>
+                    <div class="order-items">
+                        <p>Leather Crossbody Bag</p>
+                    </div>
+                    <div class="order-footer">
+                        <span class="order-total">$48.00</span>
+                        <span class="order-status shipped">Shipped</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline track-order-btn" data-order-id="12344">Track Order</button>
+                </div>
+            </div>
+            <div class="dashboard-section" id="wishlist-section">
+                <div class="wishlist-item">
+                    <div class="wishlist-image">
+                        <img src="../images/products/product-4.jpg" alt="Cashmere Sweater">
+                    </div>
+                    <div class="wishlist-details">
+                        <h4>Cashmere Sweater</h4>
+                        <p class="wishlist-price">$75.00</p>
+                        <p class="wishlist-meta">Size: L, Condition: New with tags</p>
+                    </div>
+                    <div class="wishlist-actions">
+                        <button class="btn btn-sm btn-primary add-to-cart-from-wishlist" data-product-id="4">Add to Cart</button>
+                        <button class="btn btn-sm btn-outline remove-from-wishlist" data-product-id="4">Remove</button>
+                    </div>
+                </div>
+                <div class="wishlist-item">
+                    <div class="wishlist-image">
+                        <img src="../images/products/product-6.jpg" alt="Silk Blouse">
+                    </div>
+                    <div class="wishlist-details">
+                        <h4>Silk Blouse</h4>
+                        <p class="wishlist-price">$55.00</p>
+                        <p class="wishlist-meta">Size: M, Condition: Like New</p>
+                    </div>
+                    <div class="wishlist-actions">
+                        <button class="btn btn-sm btn-primary add-to-cart-from-wishlist" data-product-id="6">Add to Cart</button>
+                        <button class="btn btn-sm btn-outline remove-from-wishlist" data-product-id="6">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-section" id="listings-section">
+                <div class="listing-item">
+                    <div class="listing-image">
+                        <img src="../images/products/product-7.jpg" alt="Vintage Leather Jacket">
+                        <div class="listing-status active">Active</div>
+                    </div>
+                    <div class="listing-details">
+                        <h4>Vintage Leather Jacket</h4>
+                        <p class="listing-price">$95.00</p>
+                        <p class="listing-meta">Listed on: July 1, 2023</p>
+                    </div>
+                    <div class="listing-actions">
+                        <button class="btn btn-sm btn-outline edit-listing" data-listing-id="1">Edit</button>
+                        <button class="btn btn-sm btn-outline delete-listing" data-listing-id="1">Delete</button>
+                    </div>
+                </div>
+                <div class="listing-item">
+                    <div class="listing-image">
+                        <img src="../images/products/product-8.jpg" alt="Designer Sunglasses">
+                        <div class="listing-status sold">Sold</div>
+                    </div>
+                    <div class="listing-details">
+                        <h4>Designer Sunglasses</h4>
+                        <p class="listing-price">$65.00</p>
+                        <p class="listing-meta">Listed on: June 15, 2023</p>
+                    </div>
+                    <div class="listing-actions">
+                        <button class="btn btn-sm btn-outline relist-item" data-listing-id="2">Relist</button>
+                        <button class="btn btn-sm btn-outline delete-listing" data-listing-id="2">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seller Dashboard Modal -->
+    <div class="modal" id="seller-dashboard-modal">
+        <div class="modal-content seller-dashboard-container">
+            <div class="modal-header">
+                <h3>Seller Dashboard</h3>
+                <button class="modal-close" id="close-seller-dashboard">&times;</button>
+            </div>
+            <div class="dashboard-tabs seller-dashboard-tabs">
+                <div class="dashboard-tab seller-dashboard-tab active" data-target="add-product-section">Add Product</div>
+                <div class="dashboard-tab seller-dashboard-tab" data-target="my-listings-section">My Listings</div>
+            </div>
+            <div class="dashboard-content">
+                <!-- Add Product Section -->
+                <div class="dashboard-section seller-dashboard-section active" id="add-product-section">
+                    <form id="seller-form">
+                        <div class="image-preview" id="item-image-preview">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                                <p>Click to upload images</p>
+                            </div>
+                        </div>
+                        <input type="file" id="product-image" class="file-input" accept="image/*">
+                        <div class="form-group">
+                            <label for="brand">Brand</label>
+                            <input type="text" id="brand" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="material">Title</label>
+                            <input type="text" id="material" class="form-control" placeholder="e.g., Vintage High-Waisted Jeans" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="size">Size</label>
+                                    <select id="size" class="form-control" required>
+                                        <option value="">Select Size</option>
+                                        <option value="XS">XS</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="condition">Condition</label>
+                                    <select id="condition" class="form-control" required>
+                                        <option value="">Select Condition</option>
+                                        <option value="New with tags">New with tags</option>
+                                        <option value="Like New">Like New</option>
+                                        <option value="Good">Good</option>
+                                        <option value="Fair">Fair</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price ($)</label>
+                            <input type="number" id="price" class="form-control" min="1" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Add This Product to Store</button>
+                    </form>
+                </div>
+                
+                <!-- My Listings Section -->
+                <div class="dashboard-section seller-dashboard-section" id="my-listings-section">
+                    <div id="my-listings-container" class="listings-container">
+                        <div class="empty-listings">
+                            <i class="fas fa-box-open fa-3x"></i>
+                            <p>You haven't listed any items yet</p>
+                            <button class="btn btn-primary seller-dashboard-tab" data-target="add-product-section">Add Your First Item</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="modal" id="quick-view-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick View</h3>
+                <button class="modal-close" id="close-quick-view">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="quick-view-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Container -->
+    <div id="checkout-container" class="checkout-container">
+        <div class="cart-header">
+            <h3>Checkout</h3>
+            <button id="close-checkout" class="close-btn">&times;</button>
+        </div>
+        <form id="checkout-form" class="checkout-form">
+            <div class="form-group">
+                <label for="checkout-name">Full Name</label>
+                <input type="text" id="checkout-name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-email">Email</label>
+                <input type="email" id="checkout-email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-address">Shipping Address</label>
+                <textarea id="checkout-address" name="address" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="checkout-pincode">Pincode</label>
+                <input type="text" id="checkout-pincode" name="pincode" required pattern="[0-9]{6}" title="Please enter a valid 6-digit pincode">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Proceed to Payment</button>
+        </form>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="../js/pages/auth-script.js"></script>
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="../js/pages/thrifting-update.js"></script>
+    <script src="../js/pages/seller-dashboard.js"></script>
+</body>
+</html>
+                         

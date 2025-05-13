@@ -1,0 +1,529 @@
+/**
+ * Rental Hub Page Styles
+ * Contains specific styles for the rental hub page
+ */
+
+/* Hero Section */
+.rental-hero {
+    position: relative;
+    padding: 120px 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)), url('../../images/hero-image.svg');
+    background-size: cover;
+    background-position: center;
+    color: var(--color-white);
+    text-align: center;
+}
+
+.rental-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s forwards 0.3s;
+}
+
+.rental-hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    font-family: 'Playfair Display', serif;
+}
+
+.rental-hero p {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-lg);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Search Container */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto var(--spacing-lg);
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 50px;
+    border: none;
+    font-size: 1rem;
+    box-shadow: var(--shadow-md);
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    transition: all var(--transition-normal);
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3), var(--shadow-md);
+}
+
+.search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.search-btn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.rental-hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+/* Featured Dresses Section */
+.featured-dresses {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+    font-family: 'Playfair Display', serif;
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--color-text-light);
+}
+
+/* Scrollable Cards */
+.scrollable-cards {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) transparent;
+}
+
+.scrollable-cards::-webkit-scrollbar {
+    height: 6px;
+}
+
+.scrollable-cards::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 6px;
+}
+
+.scrollable-cards::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* Dress Cards */
+.dress-card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+    background-color: var(--color-card-bg);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    border: 1px solid var(--color-card-border);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+}
+
+.dress-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dress-card:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.dress-card:nth-child(4) {
+    animation-delay: 0.6s;
+}
+
+.dress-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.dress-image {
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dress-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.dress-card:hover .dress-image img {
+    transform: scale(1.1);
+}
+
+.dress-details {
+    padding: var(--spacing-md);
+}
+
+.dress-title {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+.dress-price {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.dress-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.view-details-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    font-weight: 500;
+}
+
+.view-details-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* Rental Shops Section */
+.rental-shops {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-light);
+    color: var(--color-dark);
+}
+
+.dark-mode .rental-shops {
+    background-color: var(--color-dark-accent);
+    color: var(--color-white);
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.shop-card {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+}
+
+.dark-mode .shop-card {
+    background-color: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+}
+
+.shop-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.shop-card:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.shop-header {
+    padding: var(--spacing-md);
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.shop-details {
+    padding: var(--spacing-md);
+}
+
+.shop-details p {
+    margin-bottom: var(--spacing-sm);
+}
+
+.shop-actions {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-light-gray);
+    text-align: right;
+}
+
+.dark-mode .shop-actions {
+    border-top-color: var(--color-card-border);
+}
+
+/* Dress Listings Section */
+.dress-listings {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--color-card-bg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-card-border);
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+/* User Reviews Section */
+.user-reviews {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-light);
+    color: var(--color-dark);
+}
+
+.dark-mode .user-reviews {
+    background-color: var(--color-dark-accent);
+    color: var(--color-white);
+}
+
+.review-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.review-card {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.dark-mode .review-card {
+    background-color: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+}
+
+.review-card.animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.reviewer-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: var(--spacing-sm);
+    background-color: var(--color-light-gray);
+}
+
+.reviewer-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.reviewer-info {
+    flex: 1;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+}
+
+.review-rating {
+    display: flex;
+    margin-bottom: var(--spacing-sm);
+    color: #FFD700;
+}
+
+.review-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Contact Section */
+.contact-section {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+    .contact-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.contact-form {
+    background-color: var(--color-card-bg);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-card-border);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.submit-btn {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 12px 24px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: inline-block;
+}
+
+.submit-btn:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .rental-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .rental-hero p {
+        font-size: 1rem;
+    }
+    
+    .rental-hero-cta {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

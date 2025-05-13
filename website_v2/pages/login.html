@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Vogue - Login and sign up to access personalized fashion recommendations and virtual try-on features.">
+    <meta name="keywords" content="fashion login, AI fashion account, style profile, fashion authentication">
+    <meta name="author" content="AI Vogue">
+    <meta property="og:title" content="AI Vogue - Login">
+    <meta property="og:description" content="Sign in to access your personalized fashion experience with AI Vogue.">
+    <meta property="og:type" content="website">
+    <title>AI Vogue - Login</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-analytics-compat.min.js"></script>
+    <style>
+        :root {
+            --transition-slow: 0.5s ease;
+            --transition-normal: 0.3s ease;
+            --transition-fast: 0.2s ease;
+        }
+        
+        body.dark-mode {
+            --color-auth-bg: linear-gradient(135deg, #1a1a2e, #16213e);
+            --color-card-bg: rgba(30, 30, 46, 0.8);
+            --color-card-border: rgba(255, 255, 255, 0.1);
+            --color-input-bg: rgba(30, 30, 46, 0.6);
+            --color-input-border: rgba(255, 255, 255, 0.1);
+            --color-input-text: #f5f5f5;
+            --color-label: #b8b8b8;
+            --color-heading: #f5f5f5;
+            --color-error: #ff6b6b;
+        }
+        
+        body.light-mode {
+            --color-auth-bg: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+            --color-card-bg: rgba(255, 255, 255, 0.85);
+            --color-card-border: rgba(0, 0, 0, 0.05);
+            --color-input-bg: rgba(255, 255, 255, 0.9);
+            --color-input-border: rgba(0, 0, 0, 0.1);
+            --color-input-text: #333;
+            --color-label: #555;
+            --color-heading: #333;
+            --color-error: #e74c3c;
+        }
+        
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--color-auth-bg);
+            padding: 2rem;
+        }
+        
+        .auth-container {
+            background: var(--color-card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--color-card-border);
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem;
+            transition: all var(--transition-normal);
+            transform: translateY(0);
+            opacity: 0;
+            animation: fadeInUp 0.6s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-heading);
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-header p {
+            color: var(--color-label);
+            font-size: 0.95rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-label);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--color-input-border);
+            border-radius: 8px;
+            background-color: var(--color-input-bg);
+            color: var(--color-input-text);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+            outline: none;
+        }
+        
+        .form-control:focus + .input-highlight {
+            width: 100%;
+        }
+        
+        .input-highlight {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            transition: width var(--transition-normal);
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--color-secondary), var(--color-primary));
+            transition: left var(--transition-normal);
+            z-index: -1;
+        }
+        
+        .auth-btn:hover::before {
+            left: 0;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(var(--color-primary-rgb), 0.4);
+        }
+        
+        .google-btn {
+            background: var(--color-input-bg);
+            color: var(--color-input-text);
+            border: 1px solid var(--color-input-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .google-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(var(--color-primary-rgb), 0.1);
+            transition: left var(--transition-normal);
+            z-index: -1;
+        }
+        
+        .google-btn:hover::before {
+            left: 0;
+        }
+        
+        .google-btn:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--color-label);
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--color-input-border);
+        }
+        
+        .auth-divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .toggle-container {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--color-label);
+        }
+        
+        .toggle-link {
+            color: var(--color-primary);
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        
+        .toggle-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-primary);
+            transition: width var(--transition-normal);
+        }
+        
+        .toggle-link:hover::after {
+            width: 100%;
+        }
+        
+        .error-message {
+            color: var(--color-error);
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(var(--color-error-rgb), 0.1);
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .back-to-home {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: var(--color-label);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .back-to-home:hover {
+            color: var(--color-primary);
+        }
+        
+        .back-icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        @media (max-width: 500px) {
+            .auth-container {
+                padding: 1.5rem;
+            }
+            
+            .auth-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .back-to-home {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="page-transition"></div>
+    
+    <a href="index.html" class="back-to-home">
+        <svg class="back-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Home
+    </a>
+    
+    <main class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 id="form-title">Sign Up</h1>
+                <p id="form-subtitle">Create your AI Vogue account</p>
+            </div>
+            
+            <div id="error-message" class="error-message"></div>
+            
+            <form id="auth-form">
+                <div class="form-group" id="username-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                    <span class="input-highlight"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                    <span class="input-highlight"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                    <span class="input-highlight"></span>
+                </div>
+                
+                <button type="submit" id="submit-btn" class="auth-btn">Sign Up</button>
+                
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+                
+                <button type="button" id="google-btn" class="auth-btn google-btn">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+            </form>
+            
+            <div class="toggle-container">
+                <span id="toggle-text">Already have an account?</span>
+                <a href="#" id="toggle-link" class="toggle-link">Sign In</a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            // Your Firebase configuration
+            apiKey: "AIzaSyBHx_j9F49oBwZyvTnE48vEMgrfgWIQiJg",
+            authDomain: "myapp-1a88c.firebaseapp.com",
+            projectId: "myapp-1a88c",
+            storageBucket: "myapp-1a88c.firebasestorage.app",
+            messagingSenderId: "461917108978",
+            appId: "1:461917108978:web:fe181aa7004fb8da7fee6b",
+            measurementId: "G-SWKZSQJ5BP"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // DOM Elements
+        const authForm = document.getElementById('auth-form');
+        const usernameGroup = document.getElementById('username-group');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submit-btn');
+        const googleBtn = document.getElementById('google-btn');
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleLink = document.getElementById('toggle-link');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Theme toggle functionality
+        const themeToggle = document.querySelector('.theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                document.body.classList.toggle('light-mode');
+            });
+        }
+        
+        // Check if user is already logged in
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in, redirect to index.html
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Toggle between Sign Up and Sign In
+        let isSignUp = true;
+        
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isSignUp = !isSignUp;
+            
+            if (isSignUp) {
+                formTitle.textContent = 'Sign Up';
+                formSubtitle.textContent = 'Create your AI Vogue account';
+                submitBtn.textContent = 'Sign Up';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Sign In';
+                usernameGroup.style.display = 'block';
+            } else {
+                formTitle.textContent = 'Sign In';
+                formSubtitle.textContent = 'Welcome back to AI Vogue';
+                submitBtn.textContent = 'Sign In';
+                toggleText.textContent = 'Don\'t have an account?';
+                toggleLink.textContent = 'Sign Up';
+                usernameGroup.style.display = 'none';
+            }
+            
+            // Clear form and error message
+            authForm.reset();
+            errorMessage.textContent = '';
+            errorMessage.classList.remove('show');
+        });
+        
+        // Form submission
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Disable button during authentication
+            submitBtn.disabled = true;
+            submitBtn.textContent = isSignUp ? 'Creating Account...' : 'Signing In...';
+            
+            if (isSignUp) {
+                // Sign Up
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Update profile with username if provided
+                        if (usernameInput.value.trim()) {
+                            return userCredential.user.updateProfile({
+                                displayName: usernameInput.value.trim()
+                            });
+                        }
+                    })
+                    .then(() => {
+                        // Redirect to index.html after successful signup
+                        window.location.href = 'index.html';
+                    })
+                    .catch((error) => {
+                        showError(error.message);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign Up';
+                    });
+            } else {
+                // Sign In
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        // Redirect to index.html after successful login
+                        window.location.href = 'index.html';
+                    })
+                    .catch((error) => {
+                        showError(error.message);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign In';
+                    });
+            }
+        });
+        
+        // Google Sign In
+        googleBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            auth.signInWithPopup(provider)
+                .then(() => {
+                    // Redirect to index.html after successful Google sign-in
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    showError(error.message);
+                });
+        });
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Add page protection script to redirect unauthenticated users
+        function checkAuthForProtectedPages() {
+            // List of protected pages (all pages except index.html and login.html)
+            const publicPages = ['index.html', 'login.html'];
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            // If not on a public page, check authentication
+            if (!publicPages.includes(currentPage)) {
+                auth.onAuthStateChanged(user => {
+                    if (!user) {
+                        // User is not signed in, redirect to login page
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+        }
+        
+        // Run the protection check
+        checkAuthForProtectedPages();
+    </script>
+</body>
+</html>

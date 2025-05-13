@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Vogue Rental Hub - Rent designer dresses and outfits for special occasions with our AI-powered fashion rental platform.">
+    <meta name="keywords" content="fashion rental, dress rental, outfit rental, designer clothes rental, special occasion outfits">
+    <meta name="author" content="AI Vogue">
+    <meta property="og:title" content="AI Vogue - Rental Hub">
+    <meta property="og:description" content="Rent designer dresses and outfits for special occasions with our AI-powered fashion rental platform.">
+    <meta property="og:type" content="website">
+    <title>AI Vogue - Rental Hub</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/rental-hub.css">
+    <link rel="stylesheet" href="../css/pages/home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-transition"></div>
+    
+    <header class="main-header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo">
+                    <a href="index.html" aria-label="AI Vogue Home">
+                        <span class="logo-text">AI Vogue</span>
+                    </a>
+                </div>
+                <div class="nav-links">
+                    <a href="avatar-creation.html" class="nav-link">3D Avatar</a>
+                    <a href="thrifting-update.html" class="nav-link">Thrift Store</a>
+                    <a href="rental-hub.html" class="nav-link active">Rent</a>
+                    <a href="chatbot.html" class="nav-link">AI Assistant</a>
+                    <a href="http://127.0.0.1:5501/ai-clothing-app/templates/index.html" class="nav-link">Style Guide</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </div>
+                <div class="nav-actions">
+                    <button class="theme-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" viewBox="0 0 24 24"><path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                    </button>
+                    <a href="login.html" class="btn btn-primary">Login</a>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+    <style>
+        /* Rental Hub Specific Styles */
+        :root {
+            --transition-slow: 0.5s ease;
+            --transition-normal: 0.3s ease;
+            --transition-fast: 0.2s ease;
+        }
+        
+        body.dark-mode {
+            --color-bg: #121212;
+            --color-text: #f5f5f5;
+            --color-card-bg: #1e1e1e;
+            --color-card-border: #333;
+            --color-input-bg: #2a2a2a;
+            --color-input-border: #444;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: var(--z-index-modal, 1000);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal.modal-active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--color-white, #fff);
+            border-radius: var(--border-radius-lg, 12px);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            box-shadow: var(--shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.1));
+            margin: auto;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        .dark-mode .modal-content {
+            background-color: var(--color-card-bg, #1e1e1e);
+            color: var(--color-text, #f5f5f5);
+            border: 1px solid var(--color-card-border, #333);
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--color-light-gray, #eee);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dark-mode .modal-header {
+            border-bottom: 1px solid var(--color-card-border, #333);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-gray, #666);
+            transition: color 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--color-secondary, #e74c3c);
+        }
+        
+        .dark-mode .modal-close {
+            color: var(--color-text, #f5f5f5);
+        }
+        
+        /* Quick View Styles */
+        .quick-view-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .quick-view-image {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .quick-view-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .quick-view-details {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .quick-view-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: var(--color-primary, #3498db);
+            color: white;
+        }
+        
+        .quick-view-price {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 15px 0;
+            color: var(--color-primary, #3498db);
+        }
+        
+        .dark-mode .quick-view-price {
+            color: var(--color-primary-light, #5dade2);
+        }
+        
+        .quick-view-meta {
+            margin: 20px 0;
+        }
+        
+        .quick-view-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: var(--z-index-toast, 1100);
+        }
+        
+        .toast {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: var(--color-white, #fff);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+            max-width: 300px;
+        }
+        
+        .dark-mode .toast {
+            background-color: var(--color-card-bg, #1e1e1e);
+            color: var(--color-text, #f5f5f5);
+        }
+        
+        .toast.success {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--color-secondary, #e74c3c);
+        }
+        
+        .toast-icon {
+            margin-right: 10px;
+        }
+        
+        .toast-message {
+            flex: 1;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        /* Hero Section */
+        .rental-hero {
+            position: relative;
+            padding: 120px 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)), url('../images/hero-image.svg');
+            background-size: cover;
+            background-position: center;
+            color: var(--color-white);
+            text-align: center;
+        }
+        
+        .rental-hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards 0.3s;
+        }
+        
+        .rental-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: var(--spacing-md);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .rental-hero p {
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-lg);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto var(--spacing-lg);
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            box-shadow: var(--shadow-md);
+            background-color: var(--color-white);
+            color: var(--color-dark);
+            transition: all var(--transition-normal);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3), var(--shadow-md);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .search-btn:hover {
+            background-color: var(--color-primary-dark);
+        }
+        
+        .rental-hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+        }
+        
+        /* Featured Dresses Section */
+        .featured-dresses {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-sm);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .section-header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: var(--color-text-light);
+        }
+        
+        .scrollable-cards {
+            display: flex;
+            overflow-x: auto;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) 0;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-primary) transparent;
+        }
+        
+        .scrollable-cards::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .scrollable-cards::-webkit-scrollbar-thumb {
+            background-color: var(--color-primary);
+            border-radius: 6px;
+        }
+        
+        .scrollable-cards::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        
+        .dress-card {
+            flex: 0 0 300px;
+            scroll-snap-align: start;
+            background-color: var(--color-card-bg);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            border: 1px solid var(--color-card-border);
+        }
+        
+        .dress-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .dress-image {
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dress-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-normal);
+        }
+        
+        .dress-card:hover .dress-image img {
+            transform: scale(1.1);
+        }
+        
+        .dress-details {
+            padding: var(--spacing-md);
+        }
+        
+        .dress-title {
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+        
+        .dress-price {
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+        
+        .dress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+        
+        .view-details-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-weight: 500;
+        }
+        
+        .view-details-btn:hover {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+        
+        /* Responsive Grid for Desktop */
+        @media (min-width: 768px) {
+            .dress-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: var(--spacing-md);
+            }
+            
+            .dress-card {
+                flex: none;
+                width: 100%;
+            }
+        }
+        
+        /* Local Rental Shops Section */
+        .rental-shops {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--color-light);
+            color: var(--color-dark);
+        }
+        
+        .dark-mode .rental-shops {
+            background-color: var(--color-dark-accent);
+            color: var(--color-white);
+        }
+        
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .shop-card {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s forwards;
+        }
+        
+        .dark-mode .shop-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-card-border);
+        }
+        
+        .shop-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .shop-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        .shop-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .shop-header {
+            padding: var(--spacing-md);
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+        
+        .shop-details {
+            padding: var(--spacing-md);
+        }
+        
+        .shop-details p {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .shop-actions {
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--color-light-gray);
+            text-align: right;
+        }
+        
+        .dark-mode .shop-actions {
+            border-top-color: var(--color-card-border);
+        }
+        
+        /* Dress Listings Section */
+        .dress-listings {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background-color: var(--color-card-bg);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-card-border);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-input-border);
+            background-color: var(--color-input-bg);
+            color: var(--color-text);
+        }
+        
+        .rental-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .badge-hourly {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+        
+        .badge-daily {
+            background-color: var(--color-secondary);
+            color: var(--color-white);
+        }
+        
+        .rent-now-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform var(--transition-normal);
+            font-weight: 500;
+        }
+        
+        .dress-card:hover .rent-now-btn {
+            transform: translateY(0);
+        }
+        
+        /* User Reviews Section */
+        .user-reviews {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--color-light);
+            color: var(--color-dark);
+        }
+        
+        .dark-mode .user-reviews {
+            background-color: var(--color-dark-accent);
+            color: var(--color-white);
+        }
+        
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .review-card {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .dark-mode .review-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-card-border);
+        }
+        
+        .review-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .reviewer-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: var(--spacing-sm);
+            background-color: var(--color-light-gray);
+        }
+        
+        .reviewer-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .reviewer-info {
+            flex: 1;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .review-date {
+            font-size: 0.8rem;
+            color: var(--color-text-light);
+        }
+        
+        .review-rating {
+            display: flex;
+            margin-bottom: var(--spacing-sm);
+            color: #FFD700;
+        }
+        
+        .review-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+        
+        @media (min-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .contact-form {
+            background-color: var(--color-card-bg);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-card-border);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-input-border);
+            background-color: var(--color-input-bg);
+            color: var(--color-text);
+            transition: all var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 12px 24px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: inline-block;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .contact-info {
+            padding: var(--spacing-lg);
+        }
+        
+        .contact-info h3 {
+            margin-bottom: var(--spacing-md);
+            font-size: 1.5rem;
+        }
+        
+        .contact-detail {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .contact-icon {
+            margin-right: var(--spacing-sm);
+            color: var(--color-primary);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .rental-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .rental-hero p {
+                font-size: 1rem;
+            }
+            
+            .rental-hero-cta {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-transition"></div>
+    
+    <header class="main-header">
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo">
+                    <a href="index.html" aria-label="AI Vogue Home">
+                        <span class="logo-text">AI Vogue</span>
+                    </a>
+                </div>
+                <div class="nav-links">
+                    <a href="avatar-creation.html" class="nav-link">3D Avatar</a>
+                    <a href="thrifting.html" class="nav-link">Thrift Store</a>
+                    <a href="rental-hub.html" class="nav-link active">Rent</a>
+                    <a href="chatbot.html" class="nav-link">AI Assistant</a>
+                    <a href="recommendation.html" class="nav-link">Style Guide</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </div>
+                <div class="nav-actions">
+                    <button class="theme-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" viewBox="0 0 24 24"><path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                    </button>
+                    <a href="login.html" class="btn btn-primary">Login</a>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="rental-hero">
+            <div class="container">
+                <div class="rental-hero-content">
+                    <h1>Find Your Perfect Outfit</h1>
+                    <p>Rent designer dresses and outfits for any occasion. Save money and reduce fashion waste with our curated collection.</p>
+                    
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search by city, occasion...">
+                        <button class="search-btn">Search</button>
+                    </div>
+                    
+                    <div class="rental-hero-cta">
+                        <a href="#dress-listings" class="btn btn-primary btn-lg">Browse Dresses</a>
+                        <a href="#rental-shops" class="btn btn-outline btn-lg">Find Local Shops</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Featured Dresses Section -->
+        <section class="featured-dresses">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Featured Dresses</h2>
+                    <p>Discover our most popular rental options for your next special occasion</p>
+                </div>
+                
+                <div class="scrollable-cards">
+                    <!-- Dress Card 1 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <img src="../images/products/product-1.jpg" alt="Evening Gown">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Elegant Evening Gown</h3>
+                            <div class="dress-price">₹2,500/day</div>
+                            <div class="dress-meta">
+                                <span>Size: S, M, L</span>
+                                <span>★ 4.9 (42)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 2 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <img src="../images/products/product-2.jpg" alt="Cocktail Dress">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Chic Cocktail Dress</h3>
+                            <div class="dress-price">₹1,800/day</div>
+                            <div class="dress-meta">
+                                <span>Size: XS, S, M</span>
+                                <span>★ 4.7 (38)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 3 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <img src="../images/products/product-3.jpg" alt="Wedding Guest Dress">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Wedding Guest Dress</h3>
+                            <div class="dress-price">₹2,200/day</div>
+                            <div class="dress-meta">
+                                <span>Size: S, M, L</span>
+                                <span>★ 4.8 (56)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 4 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <img src="../images/products/product-4.jpg" alt="Formal Suit">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Classic Formal Suit</h3>
+                            <div class="dress-price">₹3,000/day</div>
+                            <div class="dress-meta">
+                                <span>Size: M, L, XL</span>
+                                <span>★ 4.9 (62)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Local Rental Shops Section -->
+        <section id="rental-shops" class="rental-shops">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Local Rental Shops</h2>
+                    <p>Find rental shops near you for in-person fittings and immediate rentals</p>
+                </div>
+                
+                <div class="shop-grid">
+                    <!-- Shop Card 1 -->
+                    <div class="shop-card">
+                        <div class="shop-header">
+                            <h3>Elegance Rentals</h3>
+                        </div>
+                        <div class="shop-details">
+                            <p><strong>Address:</strong> 123 Fashion Street, Mumbai, 400001</p>
+                            <p><strong>Phone:</strong> +91 98765 43210</p>
+                            <p><strong>Hours:</strong> 10:00 AM - 8:00 PM (Mon-Sat)</p>
+                        </div>
+                        <div class="shop-actions">
+                            <a href="#" class="btn btn-sm btn-primary">View Collection</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Shop Card 2 -->
+                    <div class="shop-card">
+                        <div class="shop-header">
+                            <h3>Designer Closet</h3>
+                        </div>
+                        <div class="shop-details">
+                            <p><strong>Address:</strong> 456 Style Avenue, Delhi, 110001</p>
+                            <p><strong>Phone:</strong> +91 98765 12345</p>
+                            <p><strong>Hours:</strong> 11:00 AM - 9:00 PM (All Days)</p>
+                        </div>
+                        <div class="shop-actions">
+                            <a href="#" class="btn btn-sm btn-primary">View Collection</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Shop Card 3 -->
+                    <div class="shop-card">
+                        <div class="shop-header">
+                            <h3>Glamour Rentals</h3>
+                        </div>
+                        <div class="shop-details">
+                            <p><strong>Address:</strong> 789 Trend Lane, Bangalore, 560001</p>
+                            <p><strong>Phone:</strong> +91 98765 67890</p>
+                            <p><strong>Hours:</strong> 10:30 AM - 8:30 PM (Mon-Sun)</p>
+                        </div>
+                        <div class="shop-actions">
+                            <a href="#" class="btn btn-sm btn-primary">View Collection</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dress Listings Section -->
+        <section id="dress-listings" class="dress-listings">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Browse Our Collection</h2>
+                    <p>Find the perfect outfit for your next event from our extensive collection</p>
+                </div>
+                
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label for="location-filter">Location</label>
+                        <select id="location-filter" class="filter-select">
+                            <option value="all">All Locations</option>
+                            <option value="mumbai">Mumbai</option>
+                            <option value="delhi">Delhi</option>
+                            <option value="bangalore">Bangalore</option>
+                            <option value="chennai">Chennai</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="size-filter">Size</label>
+                        <select id="size-filter" class="filter-select">
+                            <option value="all">All Sizes</option>
+                            <option value="xs">XS</option>
+                            <option value="s">S</option>
+                            <option value="m">M</option>
+                            <option value="l">L</option>
+                            <option value="xl">XL</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="occasion-filter">Occasion</label>
+                        <select id="occasion-filter" class="filter-select">
+                            <option value="all">All Occasions</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="party">Party</option>
+                            <option value="formal">Formal</option>
+                            <option value="casual">Casual</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="price-filter">Price Range</label>
+                        <select id="price-filter" class="filter-select">
+                            <option value="all">All Prices</option>
+                            <option value="budget">Under ₹1,000/day</option>
+                            <option value="mid">₹1,000 - ₹2,500/day</option>
+                            <option value="premium">Above ₹2,500/day</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="dress-grid">
+                    <!-- Dress Card 1 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <span class="rental-badge badge-daily">Daily Rental</span>
+                            <img src="../images/products/product-5.jpg" alt="Party Dress">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Sequin Party Dress</h3>
+                            <div class="dress-price">₹1,200/day</div>
+                            <div class="dress-meta">
+                                <span>Size: XS, S, M</span>
+                                <span>★ 4.6 (28)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 2 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <span class="rental-badge badge-hourly">Hourly Rental</span>
+                            <img src="../images/products/product-6.jpg" alt="Formal Gown">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Formal Evening Gown</h3>
+                            <div class="dress-price">₹300/hour</div>
+                            <div class="dress-meta">
+                                <span>Size: S, M, L</span>
+                                <span>★ 4.8 (45)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 3 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <span class="rental-badge badge-daily">Daily Rental</span>
+                            <img src="../images/products/product-7.jpg" alt="Casual Outfit">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Casual Weekend Outfit</h3>
+                            <div class="dress-price">₹800/day</div>
+                            <div class="dress-meta">
+                                <span>Size: M, L, XL</span>
+                                <span>★ 4.5 (32)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dress Card 4 -->
+                    <div class="dress-card">
+                        <div class="dress-image">
+                            <span class="rental-badge badge-daily">Daily Rental</span>
+                            <img src="../images/products/product-8.jpg" alt="Wedding Guest Outfit">
+                            <a href="#" class="rent-now-btn">Rent Now</a>
+                        </div>
+                        <div class="dress-details">
+                            <h3 class="dress-title">Wedding Guest Outfit</h3>
+                            <div class="dress-price">₹2,000/day</div>
+                            <div class="dress-meta">
+                                <span>Size: S, M, L</span>
+                                <span>★ 4.9 (52)</span>
+                            </div>
+                            <button class="view-details-btn">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- User Reviews Section -->
+        <section class="user-reviews">
+            <div class="container">
+                <div class="section-header">
+                    <h2>What Our Customers Say</h2>
+                    <p>Read reviews from people who have rented outfits through our platform</p>
+                </div>
+                
+                <div class="review-grid">
+                    <!-- Review Card 1 -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-image">
+                                <img src="../images/users/user-1.jpg" alt="Reviewer">
+                            </div>
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">Priya Sharma</div>
+                                <div class="review-date">2 weeks ago</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                        </div>
+                        <div class="review-text">
+                            <p>I rented a beautiful evening gown for my friend's wedding. The quality was amazing and it fit perfectly. The rental process was smooth and the return was hassle-free. Will definitely use again!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review Card 2 -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-image">
+                                <img src="../images/users/user-2.jpg" alt="Reviewer">
+                            </div>
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">Rahul Mehta</div>
+                                <div class="review-date">1 month ago</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                        </div>
+                        <div class="review-text">
+                            <p>Rented a suit for a business conference. The quality was top-notch and I received many compliments. The price was much more affordable than buying a new suit. Great service!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review Card 3 -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-image">
+                                <img src="../images/users/user-3.jpg" alt="Reviewer">
+                            </div>
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">Ananya Patel</div>
+                                <div class="review-date">3 weeks ago</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+                        </div>
+                        <div class="review-text">
+                            <p>The cocktail dress I rented was perfect for my event. The only reason for 4 stars is that the delivery was slightly delayed. Otherwise, the dress was in excellent condition and fit well.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Contact Us</h2>
+                    <p>Have questions about our rental service? Get in touch with us</p>
+                </div>
+                
+                <div class="contact-container">
+                    <div class="contact-form">
+                        <form id="rental-contact-form">
+                            <div class="form-group">
+                                <label for="name">Your Name</label>
+                                <input type="text" id="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" class="form-control" required></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">Send Message</button>
+                        </form>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <h3>Rental Support</h3>
+                        <div class="contact-detail">
+                            <div class="contact-icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                            </div>
+                            <div>
+                                <p><strong>Email:</strong></p>
+                                <p>rentals@aivogue.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <div class="contact-icon">
+                                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </div>
+                            <div>
+                                <p><strong>Phone:</strong></p>
+                                <p>+91 98765 43210</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <div class="contact-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            </div>
+                            <div>
+                                <p><strong>Headquarters:</strong></p>
+                                <p>123 Fashion Street, Mumbai, 400001</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail">
+                            <div class="contact-icon">
+                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                            </div>
+                            <div>
+                                <p><strong>Business Hours:</strong></p>
+                                <p>Monday - Saturday: 10:00 AM - 8:00 PM</p>
+                                <p>Sunday: 12:00 PM - 6:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="index.html">AI Vogue</a>
+                    <p>Imagine the Look, See It in 3D, Wear It in Reality</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h3>Features</h3>
+                        <ul>
+                            <li><a href="avatar-creation.html">3D Avatar</a></li>
+                            <li><a href="thrifting.html">Thrift Store</a></li>
+                            <li><a href="rental-hub.html">Rental Hub</a></li>
+                            <li><a href="chatbot.html">AI Assistant</a></li>
+                            <li><a href="recommendation.html">Style Guide</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Legal</h3>
+                        <ul>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Stay Updated</h3>
+                    <p>Subscribe to our newsletter for the latest updates and features.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 AI Vogue. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C18.34 21.21 22 17.06 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg></a>
+                    <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg></a>
+                    <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div class="modal" id="product-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-product-title">Product Title</h3>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-view-content">
+                    <div class="quick-view-image">
+                        <img id="modal-product-image" src="" alt="Product Image">
+                    </div>
+                    <div class="quick-view-details">
+                        <div class="quick-view-badges">
+                            <span class="badge" id="modal-product-badge">Daily</span>
+                        </div>
+                        <div class="quick-view-price" id="modal-product-price">₹1,200/day</div>
+                        <p id="modal-product-description">Product description will appear here.</p>
+                        <div class="quick-view-meta">
+                            <p><strong>Size:</strong> <span id="modal-product-size">Medium</span></p>
+                            <p><strong>Condition:</strong> <span id="modal-product-condition">Excellent</span></p>
+                            <p><strong>Location:</strong> <span id="modal-product-location">Mumbai</span></p>
+                        </div>
+                        <div class="quick-view-actions">
+                            <a href="#" class="btn btn-primary btn-rent-it" id="modal-rent-button">Rent It</a>
+                            <button class="btn btn-secondary">Add to Wishlist</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/core/theme-toggle.js"></script>
+    <script src="../js/core/animations.js"></script>
+    <script src="../js/pages/rental-hub.js"></script>
+    <script>
+        // Product Detail Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('product-detail-modal');
+            const closeModal = document.getElementById('close-modal');
+            const rentButton = document.getElementById('modal-rent-button');
+            const toastContainer = document.getElementById('toast-container');
+            
+            // Sample product data (in a real app, this would come from a database)
+            const products = [
+                {
+                    id: 1,
+                    title: 'Elegant Evening Gown',
+                    price: '₹1,200/day',
+                    description: 'A stunning evening gown perfect for formal events and galas. Made with high-quality fabric and intricate detailing.',
+                    image: '../images/products/dress-1.jpg',
+                    badge: 'Daily',
+                    size: 'Medium',
+                    condition: 'Excellent',
+                    location: 'Mumbai',
+                    whatsapp: 'https://wa.me/7483343783?text=I\'m%20interested%20in%20renting%20the%20Elegant%20Evening%20Gown'
+                },
+                {
+                    id: 2,
+                    title: 'Business Suit',
+                    price: '₹1,500/day',
+                    description: 'Professional business suit ideal for interviews, meetings, and corporate events. Tailored for a perfect fit.',
+                    image: '../images/products/suit-1.jpg',
+                    badge: 'Daily',
+                    size: 'Large',
+                    condition: 'Good',
+                    location: 'Delhi',
+                    whatsapp: 'https://wa.me/919876543210?text=I\'m%20interested%20in%20renting%20the%20Business%20Suit'
+                },
+                {
+                    id: 3,
+                    title: 'Cocktail Dress',
+                    price: '₹800/day',
+                    description: 'Stylish cocktail dress perfect for parties and semi-formal events. Features modern design elements.',
+                    image: '../images/products/dress-2.jpg',
+                    badge: 'Daily',
+                    size: 'Small',
+                    condition: 'Excellent',
+                    location: 'Bangalore',
+                    whatsapp: 'https://wa.me/919876543210?text=I\'m%20interested%20in%20renting%20the%20Cocktail%20Dress'
+                }
+            ];
+            
+            // Function to open modal with product details
+            function openProductModal(productId) {
+                const product = products.find(p => p.id === productId) || products[0];
+                
+                // Set modal content
+                document.getElementById('modal-product-title').textContent = product.title;
+                document.getElementById('modal-product-price').textContent = product.price;
+                document.getElementById('modal-product-description').textContent = product.description;
+                document.getElementById('modal-product-badge').textContent = product.badge;
+                document.getElementById('modal-product-size').textContent = product.size;
+                document.getElementById('modal-product-condition').textContent = product.condition;
+                document.getElementById('modal-product-location').textContent = product.location;
+                
+                // Set image if available
+                const imageElement = document.getElementById('modal-product-image');
+                if (imageElement) {
+                    imageElement.src = product.image || '';
+                    imageElement.alt = product.title;
+                }
+                
+                // Set WhatsApp link
+                rentButton.href = product.whatsapp;
+                
+                // Show modal
+                modal.classList.add('modal-active');
+            }
+            
+            // Close modal when clicking the close button
+            closeModal.addEventListener('click', function() {
+                modal.classList.remove('modal-active');
+            });
+            
+            // Close modal when clicking outside the modal content
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.classList.remove('modal-active');
+                }
+            });
+            
+            // Override the view details button functionality
+            const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+            viewDetailsButtons.forEach((button, index) => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Use index + 1 as product ID for demo purposes
+                    openProductModal(index + 1);
+                });
+            });
+            
+            // Add click event to rent now buttons
+            const rentNowButtons = document.querySelectorAll('.rent-now-btn');
+            rentNowButtons.forEach((button, index) => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Redirect to WhatsApp
+                    window.location.href = products[index % products.length].whatsapp;
+                });
+            });
+            
+            // Function to show toast notification
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        ${type === 'success' ? '✓' : '!'}
+                    </div>
+                    <div class="toast-message">${message}</div>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Remove toast after animation completes
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+            
+            // Show toast when rent button is clicked
+            rentButton.addEventListener('click', function() {
+                showToast('Redirecting to chat with the owner...');
+            });
+        });
+    </script>
+</body>
+</html>
